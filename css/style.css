@@ -233,3 +233,62 @@ body{
 }
 .modal-card h2{ font-family:'Space Grotesk',sans-serif; font-size:19px; margin:0 0 6px; }
 .modal-card p.sub{ font-size:13px; color:var(--ink-soft); margin:0 0 20px; }
+
+/* Country select — styled select box with custom arrow */
+.field select#country{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  width:100%;
+  padding:12px 40px 12px 13px; /* extra right padding for the arrow */
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  color:var(--ink);
+  background-color:var(--white);
+  cursor:pointer;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+
+  /* Custom gold chevron, drawn as an SVG background */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23cc9c30' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  background-size:12px 8px;
+}
+
+.field select#country:hover{
+  border-color:var(--gold);
+}
+
+.field select#country:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(38,91,43,0.12);
+}
+
+/* Placeholder-style look for the unselected "Select a country" option */
+.field select#country:invalid,
+.field select#country option[value=""]{
+  color:#a7ab9f;
+}
+
+.field select#country option{
+  color:var(--ink);
+  background:var(--white);
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  padding:8px;
+}
+
+/* Disabled state, for consistency with rest of form */
+.field select#country:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  background-color:#f2f0ea;
+}
+
+/* Firefox: hide the default dropdown arrow so ours shows cleanly */
+.field select#country::-ms-expand{
+  display:none;
+}
