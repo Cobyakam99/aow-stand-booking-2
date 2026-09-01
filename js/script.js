@@ -359,7 +359,6 @@ function finalize(){
   document.getElementById('cCompany').textContent = val('company');
   document.getElementById('cSlot').textContent = `${state.date} - ${state.slot}`;
   document.getElementById('cVenue').textContent = venue;
-  document.getElementById('cTeam').textContent = team;
  
   submitToFlow(ref, catLabel, team, venue);
 }
