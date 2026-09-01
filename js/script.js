@@ -178,6 +178,23 @@ function isPastTimeToday(dateStr, timeStr){
   return slotTime <= now;
 }
  
+function hhmmToMinutes(hhmm){
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+ 
+// Checks whether a 30-minute slot overlaps any part of a
+// calendar event's start-to-end range, so a long manually
+// added meeting correctly blocks every slot it spans, not
+// just the one matching its exact start time.
+function slotOverlapsEvent(slotTime, ev){
+  const slotStart = hhmmToMinutes(slotTime);
+  const slotEnd = slotStart + 30;
+  const evStart = hhmmToMinutes(ev.start);
+  const evEnd = hhmmToMinutes(ev.end);
+  return slotStart < evEnd && evStart < slotEnd;
+}
+ 
 function buildSlotsForDate(dateStr){
   const overridesForDate = SLOT_OVERRIDES[dateStr] || {};
   return DEFAULT_SLOTS.map(s => ({ time: s.time, status: overridesForDate[s.time] || s.default }));
@@ -213,7 +230,7 @@ async function renderSlots(){
  
   el.innerHTML = `<div class="note">Checking availability...</div>`;
  
-  let liveTaken = [];
+  let liveEvents = [];
   if(AVAILABILITY_URL){
     try{
       const res = await fetch(AVAILABILITY_URL, {
@@ -222,7 +239,9 @@ async function renderSlots(){
         body: JSON.stringify({ date: state.date })
       });
       const data = await res.json();
-      liveTaken = data.taken || [];
+      const starts = data.starts || [];
+      const ends = data.ends || [];
+      liveEvents = starts.map((s, i) => ({ start: s, end: ends[i] }));
     } catch(err){
       console.error("Availability check failed:", err);
     }
@@ -230,7 +249,7 @@ async function renderSlots(){
  
   const slots = buildSlotsForDate(state.date);
   el.innerHTML = slots.map(s=>{
-    const takenLive = liveTaken.includes(s.time);
+    const takenLive = liveEvents.some(ev => slotOverlapsEvent(s.time, ev));
     const past = isPastTimeToday(state.date, s.time);
     const bookable = s.status === 'available' && !takenLive && !past;
     const isSel = state.slot === s.time;
